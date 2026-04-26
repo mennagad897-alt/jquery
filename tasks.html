@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Manager</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .stats { margin-bottom: 10px; font-weight: bold; }
+        #taskList { list-style: none; padding: 0; }
+        .task-item { border: 1px solid #ccc; padding: 10px; margin: 5px 0; background: #f9f9f9; cursor: move; }
+        .completed { text-decoration: line-through; color: gray; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <h2>My Tasks</h2>
+    
+    <div class="stats">
+        Total: <span id="total">0</span> | Done: <span id="done">0</span> | Left: <span id="left">0</span>
+    </div>
+
+    <input type="text" id="taskInput" placeholder="Enter task title...">
+    <button id="addBtn">Add Task</button>
+    <br><br>
+    <input type="text" id="searchInput" placeholder="Search tasks...">
+    <br><br>
+    <button class="filter-btn" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="active">Active</button>
+    <button class="filter-btn" data-filter="completed">Completed</button>
+
+    <ul id="taskList"></ul>
+
+    <script>
+        $(document).ready(function() {
+            
+            $("#taskList").sortable();
+
+            function updateStats() {
+                var total = $(".task-item").length;
+                var done = $(".task-item.completed").length;
+                var left = total - done;
+                $("#total").text(total);
+                $("#done").text(done);
+                $("#left").text(left);
+            }
+
+            $("#addBtn").click(function() {
+                var val = $("#taskInput").val();
+                if (val !== "") {
+                    var li = $('<li class="task-item"><span>' + val + '</span> <button class="check">Done</button> <button class="edit">Edit</button> <button class="del">X</button></li>');
+                    $("#taskList").append(li.hide().fadeIn());
+                    $("#taskInput").val("");
+                    updateStats();
+                }
+            });
+
+            $(document).on("click", ".del", function() {
+                $(this).parent().fadeOut(function() {
+                    $(this).remove();
+                    updateStats();
+                });
+            });
+
+            $(document).on("click", ".check", function() {
+                $(this).parent().toggleClass("completed");
+                updateStats();
+            });
+
+            $(document).on("click", ".edit", function() {
+                var span = $(this).siblings("span");
+                var newText = prompt("Edit task:", span.text());
+                if (newText) {
+                    span.text(newText);
+                }
+            });
+
+            $("#searchInput").on("keyup", function() {
+                var txt = $(this).val().toLowerCase();
+                $(".task-item").each(function() {
+                    var match = $(this).text().toLowerCase().indexOf(txt) > -1;
+                    $(this).toggle(match);
+                });
+            });
+
+            $(".filter-btn").click(function() {
+                var f = $(this).data("filter");
+                if (f === "all") {
+                    $(".task-item").show();
+                } else if (f === "active") {
+                    $(".task-item").not(".completed").show();
+                    $(".task-item.completed").hide();
+                } else {
+                    $(".task-item.completed").show();
+                    $(".task-item").not(".completed").hide();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

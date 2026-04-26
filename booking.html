@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Booking System</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        .slot { border: 1px solid black; padding: 15px; margin: 10px; display: inline-block; width: 100px; text-align: center; }
+        .available { background-color: lightgreen; cursor: pointer; }
+        .booked { background-color: lightpink; }
+        .selected { border: 3px solid blue; }
+        .summary { margin-top: 20px; font-size: 1.2em; border-top: 1px solid #000; padding-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>Available Slots</h2>
+    <button id="showAll">All</button>
+    <button id="showAvailable">Available</button>
+    <button id="showBooked">Booked</button>
+
+    <div id="container">
+        <div class="slot available" data-time="09:00 AM">09:00 AM</div>
+        <div class="slot available" data-time="10:00 AM">10:00 AM</div>
+        <div class="slot available" data-time="11:00 AM">11:00 AM</div>
+        <div class="slot available" data-time="12:00 PM">12:00 PM</div>
+    </div>
+
+    <div class="summary">
+        Booked: <span id="countBooked">0</span> | Remaining: <span id="countLeft">4</span>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+
+            function refresh() {
+                var b = $(".booked").length;
+                var a = $(".available").length;
+                $("#countBooked").text(b);
+                $("#countLeft").text(a);
+            }
+
+            $(document).on("click", ".available", function() {
+                var conf = confirm("Book this slot at " + $(this).data("time") + "?");
+                if (conf) {
+                    $(this).removeClass("available").addClass("booked");
+                    $(this).append("<br><button class='cancel'>Cancel</button>");
+                    $(this).hide().slideDown();
+                    refresh();
+                }
+            });
+
+            $(document).on("click", ".cancel", function(e) {
+                e.stopPropagation();
+                $(this).parent().removeClass("booked").addClass("available");
+                $(this).parent().find("br, .cancel").remove();
+                refresh();
+            });
+
+            $("#showAll").click(function() {
+                $(".slot").fadeIn();
+            });
+
+            $("#showAvailable").click(function() {
+                $(".booked").fadeOut();
+                $(".available").fadeIn();
+            });
+
+            $("#showBooked").click(function() {
+                $(".available").fadeOut();
+                $(".booked").fadeIn();
+            });
+
+        });
+    </script>
+</body>
+</html>
